@@ -23,12 +23,14 @@ export default function handler(req: any, res: any) {
 
   for (const e of events) {
     const [year, month, day] = e.date.split('-').map(Number)
+
     const { error, value } = createEvent({
-      start: [year, month, day],
+      start: [year, month, day, 9, 0], // starter 09:00
+      duration: { hours: 1 },
       title: e.title,
       description: e.description,
-      duration: { hours: 24 },
-      allDay: true,
+      status: 'CONFIRMED',
+      busyStatus: 'BUSY'
     })
 
     if (error) {
@@ -44,5 +46,6 @@ export default function handler(req: any, res: any) {
   res.setHeader('Content-Disposition', 'inline; filename=halvmaraton.ics')
   return res.status(200).send(icsText)
 }
+
 
 

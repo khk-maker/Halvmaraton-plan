@@ -1,0 +1,7 @@
+{
+  "name": "halvmaraton-plan",
+  "version": "1.0.0",
+  "dependencies": {
+    "ics": "^2.41.0"
+  }
+}

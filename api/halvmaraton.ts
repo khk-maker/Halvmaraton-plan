@@ -46,6 +46,3 @@ export default function handler(req: any, res: any) {
   res.setHeader('Content-Disposition', 'inline; filename=halvmaraton.ics')
   return res.status(200).send(icsText)
 }
-
-
-

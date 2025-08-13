@@ -1,6 +1,6 @@
-import { createEvent } from 'ics'
+const { createEvent } = require('ics')
 
-export default function handler(req: any, res: any) {
+module.exports = (req, res) => {
   const events = [
     {
       title: "Intervaller – 10 km",
@@ -25,12 +25,12 @@ export default function handler(req: any, res: any) {
     const [year, month, day] = e.date.split('-').map(Number)
 
     const { error, value } = createEvent({
-      start: [year, month, day, 9, 0], // starter 09:00
+      start: [year, month, day, 9, 0],
       duration: { hours: 1 },
       title: e.title,
       description: e.description,
       status: 'CONFIRMED',
-      busyStatus: 'BUSY'
+      busyStatus: 'BUSY',
     })
 
     if (error) {

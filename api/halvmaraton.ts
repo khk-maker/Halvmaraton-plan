@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createEvents } from 'ics'
+import { createEvent } from 'ics'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const events = [
@@ -20,25 +20,30 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
   ]
 
-  const eventObjects = events.map(e => {
+  let icsText = 'BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n'
+
+  for (const e of events) {
     const [year, month, day] = e.date.split('-').map(Number)
-    return {
+    const { error, value } = createEvent({
       start: [year, month, day],
       title: e.title,
       description: e.description,
       duration: { hours: 24 },
       startOutputType: 'local',
       allDay: true,
+    })
+
+    if (error) {
+      return res.status(500).send(`Feil ved ${e.title}: ${error}`)
     }
-  })
 
-  const { error, value } = createEvents(eventObjects)
-
-  if (error) {
-    return res.status(500).send(String(error))
+    icsText += value + '\n'
   }
+
+  icsText += 'END:VCALENDAR'
 
   res.setHeader('Content-Type', 'text/calendar')
   res.setHeader('Content-Disposition', 'inline; filename=halvmaraton.ics')
-  return res.status(200).send(value)
+  return res.status(200).send(icsText)
 }
+

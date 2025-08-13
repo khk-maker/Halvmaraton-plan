@@ -1,13 +1,7 @@
-// File: app/api/halvmaraton/route.ts
-import { writeFileSync } from "fs";
-import { join } from "path";
-import { NextResponse } from "next/server";
-import { format } from "date-fns";
+import { VercelRequest, VercelResponse } from '@vercel/node'
+import { createEvents } from 'ics'
 
-export async function GET() {
-  const { ICS } = await import("ics");
-  const ics = new ICS();
-
+export default function handler(req: VercelRequest, res: VercelResponse) {
   const events = [
     {
       title: "Intervaller – 10 km",
@@ -24,29 +18,28 @@ export async function GET() {
       date: "2025-09-14",
       description: "Mål: Sub 1:30. Jevn fart, negative split.",
     }
-  ];
+  ]
 
-  for (const e of events) {
-    const [year, month, day] = e.date.split("-").map(Number);
-    ics.addEvent({
+  const eventObjects = events.map(e => {
+    const [year, month, day] = e.date.split('-').map(Number)
+    return {
       start: [year, month, day],
       title: e.title,
       description: e.description,
       duration: { hours: 24 },
-      startOutputType: "local",
+      startOutputType: 'local',
       allDay: true,
-    });
+    }
+  })
+
+  const { error, value } = createEvents(eventObjects)
+
+  if (error) {
+    return res.status(500).send(String(error))
   }
 
-  const { value } = ics.toString();
-
-  return new NextResponse(value, {
-    status: 200,
-    headers: {
-      "Content-Type": "text/calendar",
-      "Content-Disposition": "inline; filename=halvmaraton.ics",
-    },
-  });
+  res.setHeader('Content-Type', 'text/calendar')
+  res.setHeader('Content-Disposition', 'inline; filename=halvmaraton.ics')
+  return res.status(200).send(value)
 }
 
-export const dynamic = "force-dynamic";

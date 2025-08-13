@@ -1,7 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { createEvent } from 'ics'
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default function handler(req: any, res: any) {
   const events = [
     {
       title: "Intervaller – 10 km",
@@ -29,7 +28,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       title: e.title,
       description: e.description,
       duration: { hours: 24 },
-      startOutputType: 'local',
       allDay: true,
     })
 
@@ -46,4 +44,5 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   res.setHeader('Content-Disposition', 'inline; filename=halvmaraton.ics')
   return res.status(200).send(icsText)
 }
+
 
